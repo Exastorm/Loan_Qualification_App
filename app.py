@@ -1,34 +1,23 @@
 # -*- coding: utf-8 -*-
-"""Loan Qualifier Application.
-
-This is a command line application to match applicants with qualifying loans.
-
-Example:
-    $ python app.py
+"""Loan Qualifier Application. This is a command line application to match applicants with qualifying loans.
+Example: $ python app.py
 """
+
 import sys
 import fire
 import questionary
 from pathlib import Path
-
 from qualifier.utils.fileio import load_csv
-
-from qualifier.utils.calculators import (
-    calculate_monthly_debt_ratio,
-    calculate_loan_to_value_ratio,
-)
-
+from qualifier.utils.calculators import calculate_monthly_debt_ratio
+from qualifier.utils.calculators import calculate_loan_to_value_ratio
 from qualifier.filters.max_loan_size import filter_max_loan_size
 from qualifier.filters.credit_score import filter_credit_score
 from qualifier.filters.debt_to_income import filter_debt_to_income
 from qualifier.filters.loan_to_value import filter_loan_to_value
 
-
 def load_bank_data():
     """Ask for the file path to the latest banking data and load the CSV file.
-
-    Returns:
-        The bank data from the data rate sheet CSV file.
+    Returns the bank data from the data rate sheet CSV file.
     """
 
     csvpath = questionary.text("Enter a file path to a rate-sheet (.csv):").ask()
@@ -38,12 +27,9 @@ def load_bank_data():
 
     return load_csv(csvpath)
 
-
 def get_applicant_info():
     """Prompt dialog to get the applicant's financial information.
-
-    Returns:
-        Returns the applicant's financial information.
+    Returns the applicant's financial information.
     """
 
     credit_score = questionary.text("What's your credit score?").ask()
@@ -60,11 +46,10 @@ def get_applicant_info():
 
     return credit_score, debt, income, loan_amount, home_value
 
-
 def find_qualifying_loans(bank_data, credit_score, debt, income, loan, home_value):
     """Determine which loans the user qualifies for.
 
-    Loan qualification criteria is based on:
+    Loan qualification criteria:
         - Credit Score
         - Loan Size
         - Debit to Income ratio (calculated)
@@ -104,13 +89,10 @@ def find_qualifying_loans(bank_data, credit_score, debt, income, loan, home_valu
 
 def save_qualifying_loans(qualifying_loans):
     """Saves the qualifying loans to a CSV file.
-
-    Args:
-        qualifying_loans (list of lists): The qualifying bank loans.
+    Args: qualifying_loans (list of lists): The qualifying bank loans.
     """
     # @TODO: Complete the usability dialog for savings the CSV Files.
     # YOUR CODE HERE!
-
 
 def run():
     """The main function for running the script."""
@@ -128,7 +110,6 @@ def run():
 
     # Save qualifying loans
     save_qualifying_loans(qualifying_loans)
-
 
 if __name__ == "__main__":
     fire.Fire(run)
