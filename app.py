@@ -7,6 +7,7 @@ Example: $ python app.py
 import csv
 import fire
 import questionary
+from colorama import Fore, Back, Style
 from pathlib import Path
 from qualifier.utils.fileio import load_csv
 from qualifier.utils.calculators import calculate_monthly_debt_ratio
@@ -22,15 +23,14 @@ Returns the bank data from the data rate sheet CSV file.
 
 def load_bank_data():
 
-    # global input_path # not needed
     input_path = questionary.text("Please enter the file path to a .csv rate-sheet:").ask()
     input_path = Path(input_path)
     while not input_path.exists():
 
         print(f"Sorry, you have entered an incorrect path or filename: '{input_path}' cannot be found...")
         input_path = questionary.text("Please enter the file path to a .csv rate-sheet:").ask()
-        input_path = Path(input_path)
-        
+    
+    input_path = Path(input_path)
     return load_csv(input_path)
 
 """Prompt dialog to get the applicant's financial information.
@@ -78,11 +78,11 @@ def find_qualifying_loans(bank_data_, credit_score_, debt_, income_, loan_, home
     
     # Calculate the monthly debt ratio
     monthly_debt_ratio = calculate_monthly_debt_ratio(debt_, income_)
-    print(f"\n       Your monthly debt to income ratio is {int(monthly_debt_ratio * 100)}%")
+    print(Fore.CYAN + f"\n       Your monthly debt to income ratio is {int(monthly_debt_ratio * 100)}%")
 
     # Calculate loan to value ratio
     loan_to_value_ratio = calculate_loan_to_value_ratio(loan_, home_value_)
-    print(f"\n       Your loan to value ratio is {int(loan_to_value_ratio * 100)}%")
+    print(Fore.CYAN + f"\n       Your loan to value ratio is {int(loan_to_value_ratio * 100)}%")
 
     # Run qualification filters
     bank_data_filtered = filter_max_loan_size(loan_, bank_data_)
@@ -91,11 +91,14 @@ def find_qualifying_loans(bank_data_, credit_score_, debt_, income_, loan_, home
     bank_data_filtered = filter_loan_to_value(loan_to_value_ratio, bank_data_filtered)
 
     if len(bank_data_filtered) == 0:
-        print("\n       Sorry, no qualifying loans are available at this time.\n")
+        print(Fore.RED + "\n")
+        print(Fore.LIGHTWHITE_EX + Back.RED + "\n       Sorry, no qualifying loans are available at this time.\n")
     elif len(bank_data_filtered) == 1:
-        print("\n       There is 1 qualifying loan available.\n")
+        print(Back.CYAN)
+        print(Fore.YELLOW + "\n       There is 1 qualifying loan available.\n")
     else:
-        print(f"\n       There are {len(bank_data_filtered)} qualifying loans available.\n")
+        print(Back.CYAN)
+        print(Fore.YELLOW + Style.BRIGHT + Back.CYAN + f"\n       There are {len(bank_data_filtered)} qualifying loans available.\n")
 
     return bank_data_filtered
 
@@ -122,7 +125,7 @@ def view_qualifying_loans(qualifying_loans_):
 def save_qualifying_loans(qualifying_loans_):
     # view = questionary.text("Would you like to download your qualifying loan information?").ask()
     output_path = Path("qualifying_loans.csv")
-    with output_path.open("w", newline="") as csv_file:
+    with output_path.open("w", newline = "") as csv_file:
         csvwriter = csv.writer(csv_file, delimiter = ",")
         csvwriter.writerows(qualifying_loans_)
         
@@ -149,7 +152,7 @@ def run():
         # Optional: Save qualifying loans
         save_qualifying_loans(qualifying_loans)
 
-    print("\n   Thank you for using the Loan Qualification App by Exastorm.\n")
+    print(Fore.MAGENTA + "\n   Thank you for using the Loan Qualification App by Exastorm.\n")
 
 if __name__ == "__main__":
     fire.Fire(run)
