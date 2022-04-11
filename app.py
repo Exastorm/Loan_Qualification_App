@@ -4,6 +4,8 @@
 Example: $ python app.py
 """
 
+# import sys # Not using it. See comment on line 30
+import os
 import csv
 import fire
 import questionary
@@ -23,14 +25,16 @@ Returns the bank data from the data rate sheet CSV file.
 
 def load_bank_data():
 
-    input_path = questionary.text("Please enter the file path to a .csv rate-sheet:").ask()
+    print()
+    input_path = questionary.text("Please enter the file path to a .csv rate-sheet:\n").ask()
     input_path = Path(input_path)
-    while not input_path.exists():
+    while not input_path.exists(): # I replaced 'sys.exit' with a 'while' loop that runs until a valid path is entered 
 
         print(f"Sorry, you have entered an incorrect path or filename: '{input_path}' cannot be found...")
-        input_path = questionary.text("Please enter the file path to a .csv rate-sheet:").ask()
+        print()
+        input_path = questionary.text("Please enter the file path to a .csv rate-sheet:\n").ask()
+        input_path = Path(input_path)
     
-    input_path = Path(input_path)
     return load_csv(input_path)
 
 """Prompt dialog to get the applicant's financial information.
@@ -39,6 +43,7 @@ Returns the applicant's financial information.
 
 def get_applicant_info():
 
+    print()
     credit_score = questionary.text("What's your credit score?").ask()
     debt = questionary.text("What's your current amount of monthly debt? $").ask()
     income = questionary.text("What's your total monthly income? $").ask()
@@ -90,15 +95,17 @@ def find_qualifying_loans(bank_data_, credit_score_, debt_, income_, loan_, home
     bank_data_filtered = filter_debt_to_income(monthly_debt_ratio, bank_data_filtered)
     bank_data_filtered = filter_loan_to_value(loan_to_value_ratio, bank_data_filtered)
 
-    if len(bank_data_filtered) == 0:
-        print(Fore.RED + "\n")
-        print(Fore.LIGHTWHITE_EX + Back.RED + "\n       Sorry, no qualifying loans are available at this time.\n")
+    if len(bank_data_filtered) == 0: # I diversified the replies based on qualification results
+        print(Back.RED)
+        print(Back.RED + Fore.LIGHTWHITE_EX + "\n       Sorry, no qualifying loans are available at this time.")
+
     elif len(bank_data_filtered) == 1:
         print(Back.CYAN)
-        print(Fore.YELLOW + "\n       There is 1 qualifying loan available.\n")
+        print(Back.CYAN + Fore.YELLOW + Style.BRIGHT + "\n       There is 1 qualifying loan available.")
+    
     else:
         print(Back.CYAN)
-        print(Fore.YELLOW + Style.BRIGHT + Back.CYAN + f"\n       There are {len(bank_data_filtered)} qualifying loans available.\n")
+        print(Back.CYAN + Fore.YELLOW + Style.BRIGHT + f"\n       There are {len(bank_data_filtered)} qualifying loans available.")
 
     return bank_data_filtered
 
@@ -106,29 +113,43 @@ def find_qualifying_loans(bank_data_, credit_score_, debt_, income_, loan_, home
 Args: qualifying_loans_ (list of lists): The qualifying bank loans.
 """
 # @TODO: Complete the usability dialog for saving the CSV Files
-# FIRST I'm adding an additional function to optionally display results
+# First I'm adding an additional function to optionally display results
 
 def view_qualifying_loans(qualifying_loans_): 
+    print()
     view = questionary.text("Would you like to view your qualifying loan information?").ask()
+    print()
     x = 1
-    while x == 1:
-        if str.lower(view) == "yes" or "y":
+    while x == 1: # A loop to force a response with 'y', 'n', 'yes' or 'no'
+        if str.lower(view) in ["yes", "y"]:
             for each_loan in qualifying_loans_:
-                print(*each_loan)
+                print(*each_loan) # Unpacking and printing the list of lists
             x = 0
-        elif str.lower(view) == "no" or "n":
-            print()
+        elif str.lower(view) in ["no", "n"]:
             x = 0
         else:
             view = questionary.text("Please respond 'yes' or 'no'...").ask()
+            print()
     
 def save_qualifying_loans(qualifying_loans_):
-    # view = questionary.text("Would you like to download your qualifying loan information?").ask()
-    output_path = Path("qualifying_loans.csv")
-    with output_path.open("w", newline = "") as csv_file:
-        csvwriter = csv.writer(csv_file, delimiter = ",")
-        csvwriter.writerows(qualifying_loans_)
-        
+    print()
+    save = questionary.text("Would you like to download your qualifying loan information?").ask()
+    print()
+    x = 1
+    while x == 1: # A loop to force a response with 'y', 'n', 'yes' or 'no'
+        if str.lower(save) in ["yes", "y"]:
+            output_path = Path("qualifying_loans.csv")
+            with output_path.open("w", newline = "") as csv_file:
+                csvwriter = csv.writer(csv_file, delimiter = ",")
+                csvwriter.writerows(qualifying_loans_)
+            print(f'The qualifying loans shown above have been recorded on the "qualifying_loans.csv" file, which has been downloaded to {os.path.abspath("qualifying_loans.csv")}')    
+            x = 0
+        elif str.lower(save) in ["no", "n"]:
+            x = 0
+        else:
+            save = questionary.text("Please respond 'yes' or 'no'...").ask()
+            print()
+       
 """The main function for running the script."""
 
 def run():

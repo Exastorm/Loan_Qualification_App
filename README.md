@@ -1,8 +1,6 @@
 ## Loan Qualification App
 
-A simple app designed to qualify applicants and match them with available loans. The user has the option to save the loans for which they qualify in a csv file so that they can refer back to it and take further action as they see fit.
-
-"""Just after the title, introduce your project by describing attractively what the project is about and what is the main problem that inspires you to create this project or what is the main contribution for the potential user of your project."""
+A simple app designed to qualify applicants and match them with available loans. The user has the option to view the loans for which they qualify, on screen, immediately, and the option to save this data to a csv file so that they can refer back to it and take further action as they see fit.
 
 ---
 
@@ -30,8 +28,8 @@ This application is written in Python 3.9.7. using the following libraries:
 Designed and developed by Exastorm (Christian Chavez)
 fintech@exastorm.com, cchavez@ucsd.edu
 github.com/Exastorm, linkedin.com/in/Exastorm, twitter.com/Exastorm1
-
-"""In this section, list all the people who contribute to this project. You might want recruiters or potential collaborators to reach you, so include your contact email and, optionally, your LinkedIn or Twitter profile."""
+in collaboration with UC Berkeley's Fintech Program
+extension.berkeley.edu, facebook.com/UCBBootCamps/
 
 ---
 
