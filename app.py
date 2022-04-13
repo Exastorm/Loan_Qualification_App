@@ -4,10 +4,10 @@
 Example: $ python app.py
 """
 
-# import sys # Not using it. See comment on line 30
+# import sys # Not using it. See comment on line 31
+# import fire # Not using it. See comment on line 179
 import os
 import csv
-import fire
 import questionary
 from colorama import Fore, Back, Style
 from pathlib import Path
@@ -32,7 +32,7 @@ def load_bank_data():
 
         print(f"Sorry, you have entered an incorrect path or filename: '{input_path}' cannot be found...")
         print()
-        input_path = questionary.text("Please enter the file path to a .csv rate-sheet:\n").ask()
+        input_path = questionary.text("Please enter the fifle path to a .csv rate-sheet:\n").ask()
         input_path = Path(input_path)
     
     return load_csv(input_path)
@@ -123,7 +123,7 @@ def view_qualifying_loans(qualifying_loans_):
     while x == 1: # A loop to force a response with 'y', 'n', 'yes' or 'no'
         if str.lower(view) in ["yes", "y"]:
             for each_loan in qualifying_loans_:
-                print(*each_loan) # Unpacking and printing the list of lists
+                print(*each_loan, end="\n") # Unpacking and printing the list of lists and adding a line break
             x = 0
         elif str.lower(view) in ["no", "n"]:
             x = 0
@@ -165,7 +165,7 @@ def run():
         bank_data, credit_score, debt, income, loan_amount, home_value
     )
 
-    if len(qualifying_loans) > 0:
+    if len(qualifying_loans) > 0: # Skipping these two functions if there are no qualifying loans
 
         # Optional: View qualifying loans
         view_qualifying_loans(qualifying_loans)
@@ -176,4 +176,5 @@ def run():
     print(Fore.MAGENTA + "\n   Thank you for using the Loan Qualification App by Exastorm.\n")
 
 if __name__ == "__main__":
-    fire.Fire(run)
+    # fire.Fire(run) # I did not find any purpose for the 'fire' module
+    run()
