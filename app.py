@@ -9,7 +9,7 @@ Example: $ python app.py
 import os
 import csv
 import questionary
-from colorama import Fore, Back, Style
+from prettytable import PrettyTable, ALL
 from pathlib import Path
 from qualifier.utils.fileio import load_csv
 from qualifier.utils.calculators import calculate_monthly_debt_ratio
@@ -83,11 +83,11 @@ def find_qualifying_loans(bank_data_, credit_score_, debt_, income_, loan_, home
     
     # Calculate the monthly debt ratio
     monthly_debt_ratio = calculate_monthly_debt_ratio(debt_, income_)
-    print(Fore.CYAN + f"\n       Your monthly debt to income ratio is {int(monthly_debt_ratio * 100)}%")
+    print(f"\n       Your monthly debt to income ratio is {int(monthly_debt_ratio * 100)}%")
 
     # Calculate loan to value ratio
     loan_to_value_ratio = calculate_loan_to_value_ratio(loan_, home_value_)
-    print(Fore.CYAN + f"\n       Your loan to value ratio is {int(loan_to_value_ratio * 100)}%")
+    print(f"\n       Your loan to value ratio is {int(loan_to_value_ratio * 100)}%")
 
     # Run qualification filters
     bank_data_filtered = filter_max_loan_size(loan_, bank_data_)
@@ -96,16 +96,16 @@ def find_qualifying_loans(bank_data_, credit_score_, debt_, income_, loan_, home
     bank_data_filtered = filter_loan_to_value(loan_to_value_ratio, bank_data_filtered)
 
     if len(bank_data_filtered) == 0: # I diversified the replies based on qualification results
-        print(Back.RED)
-        print(Back.RED + Fore.LIGHTWHITE_EX + "\n       Sorry, no qualifying loans are available at this time.")
+        print()
+        print("\n       Sorry, no qualifying loans are available at this time.")
 
     elif len(bank_data_filtered) == 1:
-        print(Back.CYAN)
-        print(Back.CYAN + Fore.YELLOW + Style.BRIGHT + "\n       There is 1 qualifying loan available.")
+        print()
+        print("\n       There is 1 qualifying loan available.")
     
     else:
-        print(Back.CYAN)
-        print(Back.CYAN + Fore.YELLOW + Style.BRIGHT + f"\n       There are {len(bank_data_filtered)} qualifying loans available.")
+        print()
+        print(f"\n       There are {len(bank_data_filtered)} qualifying loans available.")
 
     return bank_data_filtered
 
@@ -122,11 +122,27 @@ def view_qualifying_loans(qualifying_loans_):
     x = 1
     while x == 1: # A loop to force a response with 'y', 'n', 'yes' or 'no'
         if str.lower(view) in ["yes", "y"]:
+            
+            # METHOD 1: Unpacking and printing each list, one by one, until the entire list of lists is printed
+            print("\n       Here's your loan information...\n")
             for each_loan in qualifying_loans_:
-                print(*each_loan, end="\n") # Unpacking and printing the list of lists and adding a line break
+                print(*each_loan, end="\n")
+            
+            # PAUSE BETWEEN METHODS
+            input("\n       Press 'Enter' to continue...\n")
+            
+            # METHOD 2: Using the prettytables module to display the results in a basic table format
+            print("\n       Here's your loan information... in table format\n")
+            loan_table = PrettyTable(["Lender", "Max Loan Amount", "Max LTV", "Max DTI", "Min Credit Score", "Interest Rate"])
+            for each_loan in qualifying_loans_:
+                loan_table.hrules = ALL
+                loan_table.add_row(each_loan)
+            print(loan_table)
             x = 0
+
         elif str.lower(view) in ["no", "n"]:
             x = 0
+
         else:
             view = questionary.text("Please respond 'yes' or 'no'...").ask()
             print()
@@ -173,7 +189,7 @@ def run():
         # Optional: Save qualifying loans
         save_qualifying_loans(qualifying_loans)
 
-    print(Fore.MAGENTA + "\n   Thank you for using the Loan Qualification App by Exastorm.\n")
+    print("\n   Thank you for using the Loan Qualification App by Exastorm.\n")
 
 if __name__ == "__main__":
     # fire.Fire(run) # I did not find any purpose for the 'fire' module
